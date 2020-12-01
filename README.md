@@ -5,6 +5,12 @@ This framework allows you to create imports, exports, or an export / re-import w
 ## 1. Implement the AbstractImport<TDomain, TId, TContext> base class
 ExpressionImporter is compatible with any ORM or database layer you may happen to be using, including Dapper, NHibernate, or EntityFramework. Simply implement the AbstractImport base class class.
 
+TDomain is the *Type* of object to be imported
+
+TId is the **primary key** *Type* used to identify the object
+
+TContext is a class or interface used to convey any information necessary for processing the import, including a DB Context object or any user context information.
+
     public abstract class MyAbstractImport<TDomain> : AbstractImport<TDomain, int, MyContext>
         where TDomain : IPersistentObject //Replace IPersistentObject with your object's base class or interface
     {
@@ -31,10 +37,10 @@ ExpressionImporter is compatible with any ORM or database layer you may happen t
 
         public override void AfterImport(AfterImportArgs<TDomain> e)
         {
-            //In this example, MyContext.Session is an NHibernate session used to save the new records
+            //In this example, MyContext is an NHibernate session used to save the new records
             foreach (var record in e.Records.Where(x => x.IsNew).Select(x => x.Record))
-                Context.Session.Save(record);
-            Context.Session.Flush();
+                Context.Save(record);
+            Context.Flush();
         }
     }
     
